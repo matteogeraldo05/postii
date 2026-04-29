@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "RodinNTLG";
+  src: url("./assets/fonts/RodinNTLG.otf") format("opentype");
+}
+
+@keyframes camera-flash {
+  0%   { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+.fast-active:active {
+  transition-duration: 30ms;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
