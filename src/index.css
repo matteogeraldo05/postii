@@ -5,6 +5,11 @@
   src: url("./assets/fonts/RodinNTLG.otf") format("opentype");
 }
 
+@font-face {
+  font-family: "contb";
+  src: url("./assets/fonts/contb.woff2") format("woff2");
+}
+
 @keyframes camera-flash {
   0%   { opacity: 0.8; }
   100% { opacity: 0; }
