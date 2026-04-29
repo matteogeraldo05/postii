@@ -20,6 +20,10 @@
   padding: 0;
 }
 
+* {
+  cursor: none !important;
+}
+
 html, body, #root {
   width: 100%;
   height: 100%;

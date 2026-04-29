@@ -2,9 +2,13 @@ import { useState } from "react";
 import calendarImg from "../assets/images/Mail/calendar.png";
 import createNoteImg from "../assets/images/Mail/create_note.png";
 import selectSfx from "../assets/audio/select.wav?url";
+import hoverSfx from "../assets/audio/hover.wav?url";
 
 const clickSound = new Audio(selectSfx);
 clickSound.load();
+
+const hoverSound = new Audio(hoverSfx);
+hoverSound.load();
 
 function CircleButton({ src, alt, side }: { src: string; alt: string; side: "left" | "right" }) {
   const [flashKey, setFlashKey] = useState(0);
@@ -22,6 +26,7 @@ function CircleButton({ src, alt, side }: { src: string; alt: string; side: "lef
       />
       <button
         onClick={handleClick}
+        onMouseEnter={() => { hoverSound.currentTime = 0; hoverSound.play(); }}
         className="relative z-10 size-32 rounded-full border-4 border-[#31bdef] overflow-hidden cursor-pointer bg-transparent shadow-[4px_6px_0_rgba(0,0,0,0.1)] transition-transform duration-[170ms] ease-out hover:scale-110 active:scale-99 fast-active"
       >
         <img src={src} alt={alt} className="w-full h-full object-cover" />
