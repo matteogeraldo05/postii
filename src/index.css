@@ -15,6 +15,59 @@
   100% { opacity: 0; }
 }
 
+@keyframes nudge-left {
+  0%, 100% { transform: translateX(0); }
+  50%       { transform: translateX(-6px); }
+}
+
+@keyframes nudge-right {
+  0%, 100% { transform: translateX(0); }
+  50%       { transform: translateX(6px); }
+}
+
+@keyframes board-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes button-exit-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-250%); }
+}
+
+@keyframes button-exit-right {
+  from { transform: translateX(0); }
+  to   { transform: translateX(250%); }
+}
+
+@keyframes calendar-bg-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes calendar-enter {
+  0%   { transform: translateY(-110vh); }
+  65%  { transform: translateY(3vh); }
+  82%  { transform: translateY(-1.5vh); }
+  91%  { transform: translateY(0.5vh); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes arrow-enter-left {
+  from { transform: translateY(-50%) translateX(-150vw); }
+  to   { transform: translateY(-50%) translateX(0); }
+}
+
+@keyframes arrow-enter-right {
+  from { transform: translateY(-50%) translateX(150vw); }
+  to   { transform: translateY(-50%) translateX(0); }
+}
+
+@keyframes back-button-enter {
+  from { transform: translateX(-250%); }
+  to   { transform: translateX(0); }
+}
+
 .fast-active:active {
   transition-duration: 30ms;
 }
