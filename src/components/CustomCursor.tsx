@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import pointerImg from "../assets/images/Pointer/pointer.png";
+import grabImg from "../assets/images/Pointer/grab.png";
 
 const HOTSPOT_X = 47;
 const HOTSPOT_Y = 10;
@@ -35,11 +36,22 @@ export default function CustomCursor() {
       rafId.current = requestAnimationFrame(tick);
     }
 
+    function onGrabStart() {
+      if (imgRef.current) imgRef.current.src = grabImg;
+    }
+    function onGrabEnd() {
+      if (imgRef.current) imgRef.current.src = pointerImg;
+    }
+
     window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("cursor-grab-start", onGrabStart);
+    window.addEventListener("cursor-grab-end", onGrabEnd);
     rafId.current = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("cursor-grab-start", onGrabStart);
+      window.removeEventListener("cursor-grab-end", onGrabEnd);
       cancelAnimationFrame(rafId.current);
     };
   }, []);
