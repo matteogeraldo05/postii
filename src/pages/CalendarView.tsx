@@ -211,7 +211,8 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
                     isClickable
                       ? () => {
                           playClick();
-                          onSelectDate(cellDate);
+                          setBackExiting(true);
+                          setTimeout(() => onSelectDate(cellDate), 500);
                         }
                       : undefined
                   }

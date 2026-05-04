@@ -29,6 +29,7 @@ type Note = {
   content: string;
   x: number;
   y: number;
+  created_at: string;
 };
 
 type BoardPhase = "board" | "flash" | "transitioning" | "calendar" | "composing" | "reading";
@@ -69,11 +70,11 @@ function PillButton({ label, onClick }: { label: string; onClick: () => void }) 
 }
 
 function CircleButton({
-  src, alt, side, label, onClick, onFlashEnd, exiting, entering, blocked,
+  src, alt, side, label, onClick, onFlashEnd, exiting, entering, blocked, dimmed,
 }: {
   src: string; alt: string; side: "left" | "right"; label: string;
   onClick?: () => void; onFlashEnd?: () => void;
-  exiting?: boolean; entering?: boolean; blocked?: boolean;
+  exiting?: boolean; entering?: boolean; blocked?: boolean; dimmed?: boolean;
 }) {
   const [flashKey, setFlashKey] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -128,7 +129,7 @@ function CircleButton({
           hoverSound.play();
         }}
         onMouseLeave={() => setHovered(false)}
-        className="relative z-10 size-36 rounded-full border-4 border-[#31bdef] overflow-hidden cursor-pointer bg-transparent shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-110 active:scale-99 fast-active"
+        className={`relative z-10 size-36 rounded-full border-4 border-[#31bdef] overflow-hidden cursor-pointer bg-transparent shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-110 active:scale-99 fast-active${dimmed ? " opacity-40" : ""}`}
       >
         <img src={src} alt={alt} className="w-full h-full object-cover" />
         {flashKey > 0 && (
@@ -147,11 +148,6 @@ function CircleButton({
 }
 
 export default function MessageBoard() {
-  const today = new Date();
-  const dateStr = today
-    .toLocaleDateString("en-US", { weekday: "short", month: "2-digit", day: "2-digit" })
-    .replace(",", "");
-
   const [phase, setPhase] = useState<BoardPhase>("board");
   const [calendarEntered, setCalendarEntered] = useState(false);
   const transitionDest = useRef<"calendar" | "composing">("calendar");
@@ -162,6 +158,8 @@ export default function MessageBoard() {
   const [pillsExiting, setPillsExiting] = useState(false);
   const [boardEntering, setBoardEntering] = useState(false);
   const [shaking, setShaking] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Drag + focus state
   const [topNoteId, setTopNoteId] = useState<string | null>(null);
@@ -189,18 +187,29 @@ export default function MessageBoard() {
   const phaseRef = useRef<BoardPhase>(phase);
   useEffect(() => { phaseRef.current = phase; }, [phase]);
 
-  // Load notes from Supabase on mount
+  async function loadNotesForDate(date: Date) {
+    const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const end = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+    setLoading(true);
+    const { data } = await supabase
+      .from("notes")
+      .select("*")
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString());
+    if (data) setNotes(data as Note[]);
+    setLoading(false);
+  }
+
+  // Load today's notes on mount
   useEffect(() => {
-    supabase.from("notes").select("*").then(({ data }) => {
-      if (data) setNotes(data as Note[]);
-    });
+    loadNotesForDate(new Date());
   }, []);
 
   // Drag system — all window listeners + RAF loop
   useEffect(() => {
     function onMouseDown(e: MouseEvent) {
       if (phaseRef.current !== "board") return;
-      
+
       for (const [id, el] of noteEls.current) {
         if (el.contains(e.target as Node)) {
           e.preventDefault();
@@ -281,8 +290,21 @@ export default function MessageBoard() {
       dragRafId.current = requestAnimationFrame(tick);
     }
 
-    function commitDrag(ds: NonNullable<typeof dragState.current>) {
-      supabase.from("notes").update({ x: ds.lastX, y: ds.lastY }).eq("id", ds.noteId);
+    async function commitDrag(ds: NonNullable<typeof dragState.current>) {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          x: ds.lastX,
+          y: ds.lastY
+        })
+        .eq("id", ds.noteId)
+        .select();
+
+      console.log("drag update", { data, error });
+
+      if (error) {
+        console.error(error);
+      }
     }
 
     function onMouseUp() {
@@ -296,7 +318,7 @@ export default function MessageBoard() {
         // Treat as click → open reading modal
         postSelectSound.currentTime = 0;
         postSelectSound.play();
-        openReading({ id: ds.noteId, content: ds.noteContent, x: ds.startNoteX, y: ds.startNoteY });
+        openReading({ id: ds.noteId, content: ds.noteContent, x: ds.startNoteX, y: ds.startNoteY, created_at: "" });
       } else {
         commitDrag(ds);
       }
@@ -332,12 +354,33 @@ export default function MessageBoard() {
   const blocked = phase !== "board";
   const buttonsExiting = phase === "transitioning";
 
+  const displayDate = selectedDate ?? new Date();
+  const dateStr = displayDate
+    .toLocaleDateString("en-US", { weekday: "short", month: "2-digit", day: "2-digit" })
+    .replace(",", "");
+
+  const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+  const sel0 = selectedDate ? new Date(selectedDate) : null;
+  if (sel0) sel0.setHours(0, 0, 0, 0);
+  const isViewingPast = sel0 !== null && sel0.getTime() < today0.getTime();
+
+  const atCap = notes.length >= 10;
+
   function handleCalendarEntered() {
     setCalendarEntered(true);
     setPhase("calendar");
   }
 
   function handleBack() {
+    setBoardEntering(true);
+    setPhase("board");
+    setCalendarEntered(false);
+    setTimeout(() => setBoardEntering(false), 600);
+  }
+
+  function handleSelectDate(date: Date) {
+    setSelectedDate(date);
+    loadNotesForDate(date);
     setBoardEntering(true);
     setPhase("board");
     setCalendarEntered(false);
@@ -367,17 +410,35 @@ export default function MessageBoard() {
     setModalAnim("exit-up");
   }
 
-  function handlePost() {
+  async function handlePost() {
     if (!composeText.trim()) { setShaking(true); return; }
-    const x = 5 + Math.random() * 75;
-    const y = 15 + Math.random() * 50;
-    const id = crypto.randomUUID();
+
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const { count } = await supabase
+      .from("notes")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", startOfDay.toISOString())
+      .lt("created_at", endOfDay.toISOString());
+
+    if ((count ?? 0) >= 10) { setShaking(true); return; }
+
+    const x = 5 + Math.random() * 60;
+    const y = 10 + Math.random() * 60;
     const content = composeText.trim();
-    setNotes((prev) => [...prev, { id, content, x, y }]);
-    supabase.from("notes").insert({ id, content, x, y });
+
     setComposeText("");
     setPillsExiting(true);
     setModalAnim("shrink");
+
+    const { data } = await supabase
+      .from("notes")
+      .insert({content, x, y})
+      .select()
+      .single();
+
+    if (data) setNotes((prev) => [...prev, data as Note]);
   }
 
   function handleReadClose() {
@@ -435,7 +496,7 @@ export default function MessageBoard() {
       {/* Board background */}
       {showBoard && (
         <div
-          className={`absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8] ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""}`}
+          className={`absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8] ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""} ${loading ? "opacity-80" : ""}`}
         >
           <span className="fixed top-6 left-1/2 -translate-x-1/2 text-8xl text-zinc-700 [font-family:contb,sans-serif]">
             Postii
@@ -615,7 +676,8 @@ export default function MessageBoard() {
             alt="Create note"
             side="right"
             label="Create Post"
-            blocked={blocked}
+            blocked={blocked || atCap || isViewingPast}
+            dimmed={atCap || isViewingPast}
             exiting={buttonsExiting}
             entering={boardEntering}
             onClick={handleCreateNote}
@@ -638,7 +700,7 @@ export default function MessageBoard() {
       {showCalendar && (
         <div className="absolute inset-0">
           <CalendarView
-            onSelectDate={() => {}}
+            onSelectDate={handleSelectDate}
             onBack={handleBack}
             entering={!calendarEntered}
             onEnterEnd={handleCalendarEntered}
