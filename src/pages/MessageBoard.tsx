@@ -184,8 +184,10 @@ export default function MessageBoard() {
   const dragRafId = useRef(0);
   const topNoteIdRef = useRef<string | null>(null);
 
-  // Keep notesRef current so the drag useEffect avoids stale closures
+  // Keep notesRef / phaseRef current so the drag useEffect avoids stale closures
   useEffect(() => { notesRef.current = notes; }, [notes]);
+  const phaseRef = useRef<BoardPhase>(phase);
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
 
   // Load notes from Supabase on mount
   useEffect(() => {
@@ -197,6 +199,8 @@ export default function MessageBoard() {
   // Drag system — all window listeners + RAF loop
   useEffect(() => {
     function onMouseDown(e: MouseEvent) {
+      if (phaseRef.current !== "board") return;
+      
       for (const [id, el] of noteEls.current) {
         if (el.contains(e.target as Node)) {
           e.preventDefault();
@@ -341,6 +345,8 @@ export default function MessageBoard() {
   }
 
   function openCompose() {
+    setTopNoteId(null);
+    topNoteIdRef.current = null;
     setComposeText("");
     setModalAnim("enter");
     setPillsExiting(false);
@@ -348,6 +354,8 @@ export default function MessageBoard() {
   }
 
   function openReading(note: Note) {
+    setTopNoteId(null);
+    topNoteIdRef.current = null;
     setReadingNote(note);
     setModalAnim("enter");
     setPillsExiting(false);
@@ -455,7 +463,7 @@ export default function MessageBoard() {
                 setTopNoteId(note.id);
               }
             }}
-            className={`absolute w-[300px] h-[200px] transition-transform duration-150 ease-out hover:scale-110 ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""}`}
+            className={`absolute w-[300px] h-[200px] transition-transform duration-150 ease-out hover:scale-110 ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""} ${phase !== "board" ? "pointer-events-none" : ""}`}
             style={{ left: `${note.x}%`, top: `${note.y}%`, zIndex: topNoteId === note.id ? 100 : 5 }}
           >
             {/* pushpin */}
