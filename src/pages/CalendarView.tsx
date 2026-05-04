@@ -9,12 +9,14 @@ import splashSelectSfx from "../assets/audio/splash_select.wav?url";
 import hoverSfx from "../assets/audio/hover.wav?url";
 
 const clickSound = new Audio(selectSfx);
+clickSound.volume = 0.1;
 clickSound.load();
 
 const hoverSound = new Audio(hoverSfx);
 hoverSound.load();
 
 const arrowClickSound = new Audio(splashSelectSfx);
+arrowClickSound.volume = 0.4;
 arrowClickSound.load();
 
 const DAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -47,6 +49,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
   const [postedDates, setPostedDates] = useState<Set<string>>(new Set());
   const [leftFlashKey, setLeftFlashKey] = useState(0);
   const [rightFlashKey, setRightFlashKey] = useState(0);
+  const [backExiting, setBackExiting] = useState(false);
 
   useEffect(() => {
     const year = viewMonth.getFullYear();
@@ -118,7 +121,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
       {/* background */}
       <div
         className="absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8]"
-        style={entering ? { animation: "calendar-bg-enter 0.6s ease-out forwards" } : undefined}
+        style={entering ? { animation: "calendar-bg-enter 0.6s ease-out 0.5s both" } : undefined}
       />
       {/* scanline overlay */}
       <div
@@ -136,7 +139,10 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
       >
 
       {/* calendar centered */}
-      <div className="absolute inset-0 flex items-center justify-center z-10">
+      <div
+        className="absolute inset-0 flex items-center justify-center z-10"
+        style={backExiting ? { animation: "calendar-exit-up 0.5s ease-in forwards" } : undefined}
+      >
         <div className="flex flex-col items-center bg-[#F0F0F0] border-3 border-[#979797] ring-4 ring-[#F0F0F0] shadow-[14px_14px_8px_rgba(0,0,0,0.2)]">
           {/* 7-col grid */}
           <div className="grid grid-cols-7 gap-0">
@@ -247,7 +253,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
 
       {/* left arrow */}
       {entering !== true && (
-      <div className="fixed left-6 top-2/5 z-20" style={{ animation: "arrow-enter-left 0.5s ease-out forwards" }}>
+      <div className="fixed left-6 top-2/5 z-20" style={{ animation: backExiting ? "arrow-exit-left 0.5s ease-in forwards" : "arrow-enter-left 0.5s ease-out forwards" }}>
       <button
         onClick={goPrevMonth}
         onMouseEnter={playHover}
@@ -279,7 +285,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
 
       {/* right arrow */}
       {entering !== true && (
-      <div className="fixed right-6 top-2/5 z-20" style={{ animation: "arrow-enter-right 0.5s ease-out forwards" }}>
+      <div className="fixed right-6 top-2/5 z-20" style={{ animation: backExiting ? "arrow-exit-right 0.5s ease-in forwards" : "arrow-enter-right 0.5s ease-out forwards" }}>
       {isCurrentMonth ? (
         <img
           src={rightArrowImg}
@@ -319,7 +325,14 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
 
       {/* back pill */}
       {entering !== true && (
-        <div className="fixed bottom-14 left-14 z-20 animate-[back-button-enter_0.5s_ease-out_forwards]">
+        <div
+          className="fixed bottom-14 left-14 z-20"
+          style={{
+            animation: backExiting
+              ? "button-exit-left 0.5s ease-in forwards"
+              : "back-button-enter 0.5s ease-out forwards",
+          }}
+        >
           <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
             {/* background pill */}
             <div
@@ -328,7 +341,8 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
             <button
               onClick={() => {
                 playClick();
-                onBack();
+                setBackExiting(true);
+                setTimeout(onBack, 500);
               }}
               onMouseEnter={playHover}
               className="relative z-11 h-36 w-[362px] shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-105 active:scale-99 fast-active"

@@ -6,6 +6,11 @@
 }
 
 @font-face {
+  font-family: "GrecoStd";
+  src: url("./assets/fonts/GrecoStd.otf") format("opentype");
+}
+
+@font-face {
   font-family: "contb";
   src: url("./assets/fonts/contb.woff2") format("woff2");
 }
@@ -66,6 +71,53 @@
 @keyframes back-button-enter {
   from { transform: translateX(-250%); }
   to   { transform: translateX(0); }
+}
+
+@keyframes pill-button-enter-right {
+  from { transform: translateX(250%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes arrow-exit-left {
+  from { transform: translateY(-50%) translateX(0); }
+  to   { transform: translateY(-50%) translateX(-150vw); }
+}
+
+@keyframes arrow-exit-right {
+  from { transform: translateY(-50%) translateX(0); }
+  to   { transform: translateY(-50%) translateX(150vw); }
+}
+
+@keyframes calendar-exit-up {
+  from { transform: translateY(0);      opacity: 1; }
+  to   { transform: translateY(-110vh); opacity: 0; }
+}
+
+@keyframes memo-enter {
+  0%   { transform: translateY(-120vh); }
+  65%  { transform: translateY(3vh); }
+  82%  { transform: translateY(-1.5vh); }
+  91%  { transform: translateY(0.5vh); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes memo-exit-up {
+  0%   { transform: translateY(0);      opacity: 1; }
+  100% { transform: translateY(-120vh); opacity: 0; }
+}
+
+@keyframes memo-shrink {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes textarea-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-10px); }
+  40%  { transform: translateX(10px); }
+  60%  { transform: translateX(-7px); }
+  80%  { transform: translateX(7px); }
+  100% { transform: translateX(0); }
 }
 
 .fast-active:active {
