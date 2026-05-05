@@ -337,7 +337,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
           <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
             {/* background pill */}
             <div
-              className="absolute w-140 h-48 rounded-full bg-gray-700/2 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43"
+              className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43"
             />
             <button
               onClick={() => {

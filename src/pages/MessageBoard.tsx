@@ -8,6 +8,21 @@ import postSelectSfx from "../assets/audio/message_select.wav?url";
 import postGrabSfx from "../assets/audio/grab.wav?url";
 import CalendarView from "./CalendarView";
 import { supabase } from "../lib/supabase";
+import badWordsRaw from "../assets/bad-words.txt?raw";
+
+const badWords = badWordsRaw
+  .split("\n")
+  .map(w => w.trim())
+  .filter(w => w.length > 0);
+
+const badWordRegex = new RegExp(
+  `\\b(${badWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
+  "gi"
+);
+
+function censorBadWords(text: string): string {
+  return text.replace(badWordRegex, match => "*".repeat(match.length));
+}
 
 const clickSound = new Audio(selectSfx);
 clickSound.volume = 0.1;
@@ -98,7 +113,7 @@ function CircleButton({
     : "";
 
   return (
-    <div className={`fixed bottom-14 ${side === "left" ? "left-14" : "right-14"} flex items-center justify-center ${anim}`}>
+    <div className={`fixed bottom-14 ${side === "left" ? "left-14" : "right-14"} flex items-center justify-center z-120 ${anim}`}>
       {/* button description pill */}
       <div
         className="absolute bottom-full mb-10 whitespace-nowrap bg-white rounded-full text-zinc-500 text-3xl shadow-[4px_6px_8px_rgba(0,0,0,0.1)] border-3 border-gray-400/80 pointer-events-none z-11"
@@ -117,7 +132,7 @@ function CircleButton({
 
       {/* background pill */}
       <div
-        className={`absolute w-85 h-48 rounded-full bg-gray-700/2 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 ${side === "left" ? "-left-43" : "-right-43"}`}
+        className={`absolute w-85 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 ${side === "left" ? "-left-43" : "-right-43"}`}
       />
 
       <button
@@ -275,10 +290,10 @@ export default function MessageBoard() {
       let newY = ds.startNoteY + (dy / boardH) * 100;
 
       // Clamp so the card edge hits the boundary
-      const maxX = 90 - (CARD_W / boardW) * 100;
-      const maxY = 75 - (CARD_H / boardH) * 100;
+      const maxX = 98 - (CARD_W / boardW) * 100;
+      const maxY = 96 - (CARD_H / boardH) * 100;
       newX = Math.max(2, Math.min(maxX, newX));
-      newY = Math.max(15, Math.min(maxY, newY));
+      newY = Math.max(5, Math.min(maxY, newY));
 
       ds.lastX = newX;
       ds.lastY = newY;
@@ -426,7 +441,7 @@ export default function MessageBoard() {
 
     const x = 5 + Math.random() * 60;
     const y = 10 + Math.random() * 60;
-    const content = composeText.trim();
+    const content = censorBadWords(composeText.trim());
 
     setComposeText("");
     setPillsExiting(true);
@@ -498,7 +513,9 @@ export default function MessageBoard() {
         <div
           className={`absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8] ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""} ${loading ? "opacity-80" : ""}`}
         >
-          <span className="fixed top-6 left-1/2 -translate-x-1/2 text-8xl text-zinc-700 [font-family:contb,sans-serif]">
+          
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-[28%] h-36 bg-[#fffeff]/50 border-4 border-[#A3A3A3] shadow-[4px_4px_4px_rgba(0,0,0,0.2)] rounded-b-full z-299" />
+          <span className="fixed top-1 left-1/2 -translate-x-1/2 text-8xl text-zinc-700 [font-family:contb,sans-serif] z-300">
             Postii
           </span>
           <span className="fixed bottom-14 left-1/2 -translate-x-1/2 text-6xl text-zinc-500 [font-family:RodinNTLG,sans-serif]">
@@ -553,10 +570,10 @@ export default function MessageBoard() {
       {/* Compose modal */}
       {phase === "composing" && (
         <>
-          <div className="absolute inset-0 z-30 flex items-center justify-center">
+          <div className="absolute inset-0 z-300 flex items-center justify-center">
             <div className={modalAnimClass} onAnimationEnd={onModalAnimEnd}>
               <div
-                className={`w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6${shaking ? " animate-[textarea-shake_0.4s_ease-in-out]" : ""}`}
+                className={`w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6 ${shaking ? " animate-[textarea-shake_0.4s_ease-in-out]" : ""}`}
                 onAnimationEnd={() => { if (shaking) setShaking(false); }}
               >
                 <div className="bg-[#A3A3A3] h-[60px] flex items-center justify-center text-white text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
@@ -592,20 +609,20 @@ export default function MessageBoard() {
 
           {/* Back pill */}
           <div
-            className={`fixed bottom-14 left-14 z-50 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
+            className={`fixed bottom-14 left-14 z-500 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
           >
             <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
-              <div className="absolute w-140 h-48 rounded-full bg-gray-700/2 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
+              <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
               <PillButton label="Back" onClick={handleComposeBack} />
             </div>
           </div>
 
           {/* Post pill */}
           <div
-            className={`fixed bottom-14 right-14 z-50 ${pillsExiting ? "animate-[button-exit-right_0.5s_ease-in_forwards]" : "animate-[pill-button-enter-right_0.5s_ease-out_forwards]"}`}
+            className={`fixed bottom-14 right-14 z-500 ${pillsExiting ? "animate-[button-exit-right_0.5s_ease-in_forwards]" : "animate-[pill-button-enter-right_0.5s_ease-out_forwards]"}`}
           >
             <div className="flex items-center justify-center scale-[0.85] origin-bottom-right">
-              <div className="absolute w-140 h-48 rounded-full bg-gray-700/2 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -right-43" />
+              <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -right-43" />
               <PillButton label="Post" onClick={handlePost} />
             </div>
           </div>
@@ -615,7 +632,7 @@ export default function MessageBoard() {
       {/* Read modal */}
       {phase === "reading" && readingNote && (
         <>
-          <div className="absolute inset-0 z-30 flex items-center justify-center">
+          <div className="absolute inset-0 z-300 flex items-center justify-center">
             <div className={modalAnimClass} onAnimationEnd={onModalAnimEnd}>
               <div className="w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6">
                 <div className="bg-[#A3A3A3] h-[60px] flex items-center justify-center text-white text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
@@ -644,10 +661,10 @@ export default function MessageBoard() {
 
           {/* Close pill */}
           <div
-            className={`fixed bottom-14 left-14 z-50 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
+            className={`fixed bottom-14 left-14 z-500 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
           >
             <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
-              <div className="absolute w-140 h-48 rounded-full bg-gray-700/2 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
+              <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
               <PillButton label="Close" onClick={handleReadClose} />
             </div>
           </div>
