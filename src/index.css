@@ -135,8 +135,10 @@
   padding: 0;
 }
 
-* {
-  cursor: none !important;
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
 }
 
 html, body, #root {

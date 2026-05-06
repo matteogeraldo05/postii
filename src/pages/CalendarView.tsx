@@ -149,7 +149,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
             {DAY_HEADERS.map((label, idx) => (
               <div
                 key={`hdr-${label}`}
-                className="w-24 h-10 flex items-center justify-center text-xl font-semibold border-2 border-[#979797]"
+                className="w-11 h-8 sm:w-16 sm:h-10 md:w-24 flex items-center justify-center text-xs sm:text-sm md:text-xl font-semibold border-2 border-[#979797]"
                 style={{
                   fontFamily: "RodinNTLG, sans-serif",
                   color: dayColor(idx, false),
@@ -174,10 +174,10 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
                 return (
                   <div
                     key={`adj-${i}`}
-                    className="relative w-24 h-16 border-2 border-[#979797] bg-[#DCDCDC] overflow-hidden flex items-center justify-center"
+                    className="relative w-11 h-11 sm:w-16 sm:h-14 md:w-24 md:h-16 border-2 border-[#979797] bg-[#DCDCDC] overflow-hidden flex items-center justify-center"
                   >
                     <span
-                      className="text-3xl"
+                      className="text-base sm:text-xl md:text-3xl"
                       style={{ fontFamily: "RodinNTLG, sans-serif", color: dayColor(adjDow, true) }}
                     >
                       {adjDay}
@@ -204,7 +204,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
               return (
                 <div
                   key={`cell-${i}`}
-                  className={`relative z-0 w-24 h-16 border-2 border-[#979797] flex items-center justify-center ${interactiveClasses}`}
+                  className={`relative z-0 w-11 h-11 sm:w-16 sm:h-14 md:w-24 md:h-16 border-2 border-[#979797] flex items-center justify-center ${interactiveClasses}`}
                   style={{ backgroundColor: bg }}
                   onMouseEnter={isClickable ? playHover : undefined}
                   onClick={
@@ -218,7 +218,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
                   }
                 >
                   <span
-                    className="text-3xl"
+                    className="text-base sm:text-xl md:text-3xl"
                     style={{
                       fontFamily: "RodinNTLG, sans-serif",
                       color: numberColor,
@@ -231,7 +231,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
                       <img
                         src={envelopeImg}
                         alt=""
-                        className="absolute bottom-1 right-1 w-6 h-6 object-contain"
+                        className="absolute bottom-1 right-1 w-4 h-4 sm:w-6 sm:h-6 object-contain"
                       />
                     </div>
                   )}
@@ -241,9 +241,9 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
           </div>
 
           {/* month label */}
-          <div className="w-full flex items-center justify-end border-t-2 border-[#979797]" style={{ padding: "20px 24px" }}>
+          <div className="w-full flex items-center justify-end border-t-2 border-[#979797] p-3 sm:p-5">
             <span
-              className="text-5xl"
+              className="text-xl sm:text-3xl md:text-5xl"
               style={{ fontFamily: "RodinNTLG, sans-serif", color: "#8C8C8C" }}
             >
               {monthLabel}
@@ -254,14 +254,14 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
 
       {/* left arrow */}
       {entering !== true && (
-      <div className="fixed left-6 top-2/5 z-20" style={{ animation: backExiting ? "arrow-exit-left 0.5s ease-in forwards" : "arrow-enter-left 0.5s ease-out forwards" }}>
+      <div className="fixed left-6 top-1/4 sm:top-2/5 z-20" style={{ animation: backExiting ? "arrow-exit-left 0.5s ease-in forwards" : "arrow-enter-left 0.5s ease-out forwards" }}>
       <button
         onClick={goPrevMonth}
         onMouseEnter={playHover}
         className="bg-transparent border-0 p-0 cursor-pointer hover:scale-130 transition-transform duration-[170ms] ease-out active:scale-99 fast-active"
       >
         <div className="relative inline-block animate-[nudge-left_1.8s_ease-in-out_infinite]">
-          <img src={leftArrowImg} alt="Previous month" className="h-28 w-auto" />
+          <img src={leftArrowImg} alt="Previous month" className="h-16 sm:h-28 w-auto" />
           {leftFlashKey > 0 && (
             <div
               key={leftFlashKey}
@@ -286,12 +286,12 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
 
       {/* right arrow */}
       {entering !== true && (
-      <div className="fixed right-6 top-2/5 z-20" style={{ animation: backExiting ? "arrow-exit-right 0.5s ease-in forwards" : "arrow-enter-right 0.5s ease-out forwards" }}>
+      <div className="fixed right-6 top-1/4 sm:top-2/5 z-20" style={{ animation: backExiting ? "arrow-exit-right 0.5s ease-in forwards" : "arrow-enter-right 0.5s ease-out forwards" }}>
       {isCurrentMonth ? (
         <img
           src={rightArrowImg}
           alt=""
-          className="h-28 w-auto opacity-30"
+          className="h-16 sm:h-28 w-auto opacity-30"
         />
       ) : (
         <button
@@ -300,7 +300,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
           className="bg-transparent border-0 p-0 cursor-pointer hover:scale-130 transition-transform duration-[170ms] ease-out active:scale-99 fast-active"
         >
           <div className="relative inline-block animate-[nudge-right_1.8s_ease-in-out_infinite]">
-            <img src={rightArrowImg} alt="Next month" className="h-28 w-auto" />
+            <img src={rightArrowImg} alt="Next month" className="h-16 sm:h-28 w-auto" />
             {rightFlashKey > 0 && (
               <div
                 key={rightFlashKey}
@@ -327,17 +327,17 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
       {/* back pill */}
       {entering !== true && (
         <div
-          className="fixed bottom-14 left-14 z-20"
+          className="fixed bottom-4 sm:bottom-14 left-4 sm:left-14 z-20"
           style={{
             animation: backExiting
               ? "button-exit-left 0.5s ease-in forwards"
               : "back-button-enter 0.5s ease-out forwards",
           }}
         >
-          <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
+          <div className="flex items-center justify-center scale-[0.6] sm:scale-[0.85] origin-bottom-left">
             {/* background pill */}
             <div
-              className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43"
+              className="absolute w-96 sm:w-140 h-32 sm:h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-28 sm:-left-43"
             />
             <button
               onClick={() => {
@@ -346,7 +346,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
                 setTimeout(onBack, 500);
               }}
               onMouseEnter={playHover}
-              className="relative z-11 h-36 w-[362px] shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-105 active:scale-99 fast-active"
+              className="relative z-11 h-28 w-64 sm:h-36 sm:w-[362px] shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-105 active:scale-99 fast-active"
               style={{ borderRadius: "9999px" }}
             >
               <img
@@ -356,7 +356,7 @@ export default function CalendarView({ onSelectDate, onBack, entering, onEnterEn
               />
               <div className="absolute inset-0 rounded-full border-4 border-[#31bdef]" />
               <span
-                className="absolute inset-0 flex items-center justify-center text-5xl"
+                className="absolute inset-0 flex items-center justify-center text-3xl sm:text-5xl"
                 style={{ fontFamily: "RodinNTLG, sans-serif", color: "#3d3d3d" }}
               >
                 Back

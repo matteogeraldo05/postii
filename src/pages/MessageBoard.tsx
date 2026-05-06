@@ -66,11 +66,11 @@ function PillButton({ label, onClick, noFlash }: { label: string; onClick: () =>
         hoverSound.currentTime = 0;
         hoverSound.play();
       }}
-      className="relative z-11 h-36 w-[362px] rounded-full shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-105 active:scale-99 fast-active"
+      className="relative z-11 h-28 w-64 sm:h-36 sm:w-[362px] rounded-full shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-105 active:scale-99 fast-active"
     >
       <img src={pillImg} alt="" className="absolute inset-0 w-full h-full object-fill" />
       <div className="absolute inset-0 rounded-full border-4 border-[#31bdef]" />
-      <span className="absolute inset-0 flex items-center justify-center text-5xl [font-family:RodinNTLG,sans-serif] text-[#3d3d3d]">
+      <span className="absolute inset-0 flex items-center justify-center text-3xl sm:text-5xl [font-family:RodinNTLG,sans-serif] text-[#3d3d3d]">
         {label}
       </span>
       {!noFlash && flashKey > 0 && (
@@ -113,10 +113,10 @@ function CircleButton({
     : "";
 
   return (
-    <div className={`fixed bottom-14 ${side === "left" ? "left-14" : "right-14"} flex items-center justify-center z-120 ${anim}`}>
+    <div className={`fixed bottom-6 sm:bottom-14 ${side === "left" ? "left-6 sm:left-14" : "right-6 sm:right-14"} flex items-center justify-center z-120 ${anim}`}>
       {/* button description pill */}
       <div
-        className="absolute bottom-full mb-10 whitespace-nowrap bg-white rounded-full text-zinc-500 text-3xl shadow-[4px_6px_8px_rgba(0,0,0,0.1)] border-3 border-gray-400/80 pointer-events-none z-11"
+        className="absolute bottom-full mb-10 whitespace-nowrap bg-white rounded-full text-zinc-500 text-xl sm:text-3xl shadow-[4px_6px_8px_rgba(0,0,0,0.1)] border-3 border-gray-400/80 pointer-events-none z-11"
         style={{
           fontFamily: "RodinNTLG, sans-serif",
           padding: "13px 24px",
@@ -132,7 +132,7 @@ function CircleButton({
 
       {/* background pill */}
       <div
-        className={`absolute w-85 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 ${side === "left" ? "-left-43" : "-right-43"}`}
+        className={`absolute w-60 sm:w-85 h-36 sm:h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 ${side === "left" ? "-left-30 sm:-left-43" : "-right-30 sm:-right-43"}`}
       />
 
       <button
@@ -144,7 +144,7 @@ function CircleButton({
           hoverSound.play();
         }}
         onMouseLeave={() => setHovered(false)}
-        className={`relative z-10 size-36 rounded-full border-4 border-[#31bdef] overflow-hidden cursor-pointer bg-transparent shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-110 active:scale-99 fast-active${dimmed ? " opacity-40" : ""}`}
+        className={`relative z-10 size-24 sm:size-36 rounded-full border-3 sm:border-4 border-[#31bdef] overflow-hidden cursor-pointer bg-transparent shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-110 active:scale-99 fast-active${dimmed ? " opacity-40" : ""}`}
       >
         <img src={src} alt={alt} className="w-full h-full object-cover" />
         {!noFlash && flashKey > 0 && (
@@ -469,13 +469,17 @@ export default function MessageBoard() {
       setModalAnim("idle");
     } else if (modalAnim === "exit-up") {
       setOverlayFading(true);
+      setBoardEntering(true);
       setPhase("board");
       setReadingNote(null);
       setTimeout(() => setOverlayFading(false), 400);
+      setTimeout(() => setBoardEntering(false), 600);
     } else if (modalAnim === "shrink") {
       setOverlayFading(true);
+      setBoardEntering(true);
       setPhase("board");
       setTimeout(() => setOverlayFading(false), 400);
+      setTimeout(() => setBoardEntering(false), 600);
     }
   }
 
@@ -514,11 +518,11 @@ export default function MessageBoard() {
           className={`absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8] ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : boardEntering ? "animate-[board-fade-in_0.4s_ease-out_forwards]" : ""} ${loading ? "opacity-80" : ""}`}
         >
           
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-[28%] h-36 bg-[#fffeff]/50 border-4 border-[#A3A3A3] shadow-[4px_4px_4px_rgba(0,0,0,0.2)] rounded-b-full z-299" />
-          <span className="fixed top-1 left-1/2 -translate-x-1/2 text-8xl text-zinc-700 [font-family:contb,sans-serif] z-300">
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-[40%] sm:w-[28%] h-24 sm:h-36 bg-[#fffeff]/50 border-4 border-[#A3A3A3] shadow-[4px_4px_4px_rgba(0,0,0,0.2)] rounded-b-full z-299" />
+          <span className="fixed top-1 left-1/2 -translate-x-1/2 text-5xl sm:text-8xl text-zinc-700 [font-family:contb,sans-serif] z-300">
             Postii
           </span>
-          <span className="fixed bottom-14 left-1/2 -translate-x-1/2 text-6xl text-zinc-500 [font-family:RodinNTLG,sans-serif]">
+          <span className="fixed bottom-6 sm:bottom-14 left-1/2 -translate-x-1/2 text-3xl sm:text-6xl text-zinc-500 [font-family:RodinNTLG,sans-serif]">
             {dateStr}
           </span>
         </div>
@@ -541,7 +545,14 @@ export default function MessageBoard() {
                 setTopNoteId(note.id);
               }
             }}
-            className={`absolute w-[300px] h-[200px] transition-transform duration-150 ease-out hover:scale-110 ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : boardEntering ? "animate-[board-fade-in_0.4s_ease-out_forwards]" : ""} ${phase !== "board" ? "pointer-events-none" : ""}`}
+            onTouchEnd={(e) => {
+              if (phase !== "board") return;
+              e.preventDefault();
+              postSelectSound.currentTime = 0;
+              postSelectSound.play();
+              openReading(note);
+            }}
+            className={`absolute w-[180px] h-[130px] sm:w-[300px] sm:h-[200px] transition-transform duration-150 ease-out hover:scale-110 ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : boardEntering ? "animate-[board-fade-in_0.4s_ease-out_forwards]" : ""} ${phase !== "board" ? "pointer-events-none" : ""}`}
             style={{ left: `${note.x}%`, top: `${note.y}%`, zIndex: topNoteId === note.id ? 100 : 5 }}
           >
             {/* pushpin */}
@@ -552,7 +563,7 @@ export default function MessageBoard() {
             {/* card */}
             <div className="bg-white rounded-[14px] border-2 border-[#A3A3A3] shadow-[8px_8px_2px_rgba(0,0,0,0.2)] overflow-hidden ring-4 ring-white h-full flex flex-col">
               <div className="bg-[#A3A3A3] h-[28px]" />
-              <div className="px-[14px] py-[12px] text-center break-words whitespace-pre-wrap leading-tight [font-family:GrecoStd,sans-serif] text-3xl text-[#3d3d3d] flex flex-col justify-end h-full" style={{ paddingBottom: "30px" }}>
+              <div className="px-[14px] py-[12px] text-center break-words whitespace-pre-wrap leading-tight [font-family:GrecoStd,sans-serif] text-xl sm:text-3xl text-[#3d3d3d] flex flex-col justify-end h-full" style={{ paddingBottom: "30px" }}>
                 {note.content.length > 20
                   ? `${note.content.slice(0, 20)}...`
                   : note.content}
@@ -573,19 +584,18 @@ export default function MessageBoard() {
           <div className="absolute inset-0 z-300 flex items-center justify-center">
             <div className={modalAnimClass} onAnimationEnd={onModalAnimEnd}>
               <div
-                className={`w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6 ${shaking ? " animate-[textarea-shake_0.4s_ease-in-out]" : ""}`}
+                className={`w-[calc(100vw-2rem)] sm:w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6 ${shaking ? " animate-[textarea-shake_0.4s_ease-in-out]" : ""}`}
                 onAnimationEnd={() => { if (shaking) setShaking(false); }}
               >
-                <div className="bg-[#A3A3A3] h-[60px] flex items-center justify-center text-white text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
-                <div className="bg-white p-8">
+                <div className="bg-[#A3A3A3] h-10 sm:h-[60px] flex items-center justify-center text-white text-xl sm:text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
+                <div className="bg-white p-4 sm:p-8">
                   <textarea
                     value={composeText}
                     onChange={(e) => setComposeText(e.target.value)}
                     maxLength={1000}
                     placeholder="Write a post..."
-                    className="w-full bg-transparent border-none outline-none text-left placeholder:text-center [font-family:GrecoStd,sans-serif] text-4xl text-[#3d3d3d] resize-none min-h-[420px] leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y]"
+                    className="w-full bg-transparent border-none outline-none text-left placeholder:text-center [font-family:GrecoStd,sans-serif] text-2xl sm:text-4xl text-[#3d3d3d] resize-none min-h-[240px] sm:min-h-[420px] leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y] px-5 sm:px-11"
                     style={{
-                      padding: "0 44px",
                       backgroundSize: "calc(100% - 56px) 56px",
                       backgroundPosition: "18px 0"
                     }}
@@ -609,20 +619,20 @@ export default function MessageBoard() {
 
           {/* Back pill */}
           <div
-            className={`fixed bottom-14 left-14 z-500 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
+            className={`fixed bottom-4 sm:bottom-14 left-4 sm:left-14 z-500 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
           >
-            <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
-              <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
+            <div className="flex items-center justify-center scale-[0.6] sm:scale-[0.85] origin-bottom-left">
+              <div className="absolute w-96 sm:w-140 h-32 sm:h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-28 sm:-left-43" />
               <PillButton label="Back" onClick={handleComposeBack} noFlash />
             </div>
           </div>
 
           {/* Post pill */}
           <div
-            className={`fixed bottom-14 right-14 z-500 ${pillsExiting ? "animate-[button-exit-right_0.5s_ease-in_forwards]" : "animate-[pill-button-enter-right_0.5s_ease-out_forwards]"}`}
+            className={`fixed bottom-4 sm:bottom-14 right-4 sm:right-14 z-500 ${pillsExiting ? "animate-[button-exit-right_0.5s_ease-in_forwards]" : "animate-[pill-button-enter-right_0.5s_ease-out_forwards]"}`}
           >
-            <div className="flex items-center justify-center scale-[0.85] origin-bottom-right">
-              <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -right-43" />
+            <div className="flex items-center justify-center scale-[0.6] sm:scale-[0.85] origin-bottom-right">
+              <div className="absolute w-96 sm:w-140 h-32 sm:h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -right-28 sm:-right-43" />
               <PillButton label="Post" onClick={handlePost} noFlash />
             </div>
           </div>
@@ -634,13 +644,12 @@ export default function MessageBoard() {
         <>
           <div className="absolute inset-0 z-300 flex items-center justify-center">
             <div className={modalAnimClass} onAnimationEnd={onModalAnimEnd}>
-              <div className="w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6">
-                <div className="bg-[#A3A3A3] h-[60px] flex items-center justify-center text-white text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
-                <div className="bg-white p-8">
+              <div className="w-[calc(100vw-2rem)] sm:w-[720px] bg-white rounded-[28px] border-[3px] border-[#A3A3A3] shadow-[14px_14px_8px_rgba(0,0,0,0.2)] overflow-hidden ring-white ring-6">
+                <div className="bg-[#A3A3A3] h-10 sm:h-[60px] flex items-center justify-center text-white text-xl sm:text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
+                <div className="bg-white p-4 sm:p-8">
                   <p
-                    className="w-full [font-family:GrecoStd,sans-serif] text-4xl text-[#3d3d3d] min-h-[420px] whitespace-pre-wrap break-words leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y]"
+                    className="w-full [font-family:GrecoStd,sans-serif] text-2xl sm:text-4xl text-[#3d3d3d] min-h-[240px] sm:min-h-[420px] whitespace-pre-wrap break-words leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y] px-5 sm:px-11"
                     style={{
-                      padding: "0 44px",
                       backgroundSize: "calc(100% - 56px) 56px",
                       backgroundPosition: "18px 0"
                     }}
@@ -661,10 +670,10 @@ export default function MessageBoard() {
 
           {/* Close pill */}
           <div
-            className={`fixed bottom-14 left-14 z-500 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
+            className={`fixed bottom-4 sm:bottom-14 left-4 sm:left-14 z-500 ${pillsExiting ? "animate-[button-exit-left_0.5s_ease-in_forwards]" : "animate-[back-button-enter_0.5s_ease-out_forwards]"}`}
           >
-            <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
-              <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
+            <div className="flex items-center justify-center scale-[0.6] sm:scale-[0.85] origin-bottom-left">
+              <div className="absolute w-96 sm:w-140 h-32 sm:h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-28 sm:-left-43" />
               <PillButton label="Close" onClick={handleReadClose} noFlash />
             </div>
           </div>
@@ -706,11 +715,11 @@ export default function MessageBoard() {
       {/* Cap-hit shake indicator — fixed ring that shakes over the create-note button */}
       {capShaking && (
         <div
-          className="fixed bottom-14 right-14 pointer-events-none animate-[textarea-shake_0.4s_ease-in-out]"
+          className="fixed bottom-6 sm:bottom-14 right-6 sm:right-14 pointer-events-none animate-[textarea-shake_0.4s_ease-in-out]"
           style={{ zIndex: 150 }}
           onAnimationEnd={() => setCapShaking(false)}
         >
-          <div className="size-36 rounded-full border-4 border-red-400 opacity-80" />
+          <div className="size-24 sm:size-36 rounded-full border-4 border-red-400 opacity-80" />
         </div>
       )}
 

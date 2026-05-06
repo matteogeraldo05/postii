@@ -61,6 +61,7 @@ export default function CustomCursor() {
       ref={imgRef}
       src={pointerImg}
       alt=""
+      className="[@media(pointer:coarse)]:hidden"
       style={{
         position: "fixed",
         top: 0,
