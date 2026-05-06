@@ -32,7 +32,7 @@ const hoverSound = new Audio(hoverSfx);
 hoverSound.load();
 
 const postSelectSound = new Audio(postSelectSfx);
-postSelectSound.volume = 0.3;
+postSelectSound.volume = 0.5;
 postSelectSound.load();
 
 const postGrabSound = new Audio(postGrabSfx);
@@ -198,10 +198,12 @@ export default function MessageBoard() {
   const dragRafId = useRef(0);
   const topNoteIdRef = useRef<string | null>(null);
 
-  // Keep notesRef / phaseRef current so the drag useEffect avoids stale closures
+  // Keep notesRef / phaseRef / selectedDateRef current so the drag useEffect avoids stale closures
   useEffect(() => { notesRef.current = notes; }, [notes]);
   const phaseRef = useRef<BoardPhase>(phase);
   useEffect(() => { phaseRef.current = phase; }, [phase]);
+  const selectedDateRef = useRef<Date | null>(null);
+  useEffect(() => { selectedDateRef.current = selectedDate; }, [selectedDate]);
 
   async function loadNotesForDate(date: Date) {
     const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -225,6 +227,12 @@ export default function MessageBoard() {
   useEffect(() => {
     function onMouseDown(e: MouseEvent) {
       if (phaseRef.current !== "board") return;
+      const sel = selectedDateRef.current;
+      if (sel) {
+        const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+        const sel0 = new Date(sel); sel0.setHours(0, 0, 0, 0);
+        if (sel0.getTime() < today0.getTime()) return;
+      }
 
       for (const [id, el] of noteEls.current) {
         if (el.contains(e.target as Node)) {
@@ -594,10 +602,11 @@ export default function MessageBoard() {
                     onChange={(e) => setComposeText(e.target.value)}
                     maxLength={1000}
                     placeholder="Write a post..."
-                    className="w-full bg-transparent border-none outline-none text-left placeholder:text-center [font-family:GrecoStd,sans-serif] text-2xl sm:text-4xl text-[#3d3d3d] resize-none min-h-[240px] sm:min-h-[420px] leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y] px-5 sm:px-11"
+                    className="w-full bg-transparent border-none outline-none text-left placeholder:text-center [font-family:GrecoStd,sans-serif] text-2xl sm:text-4xl text-[#3d3d3d] resize-none min-h-[240px] sm:min-h-[420px] leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y]"
                     style={{
                       backgroundSize: "calc(100% - 56px) 56px",
-                      backgroundPosition: "18px 0"
+                      backgroundPosition: "18px 0",
+                      padding: "0 48px",
                     }}
                   />
                   <hr style={{ marginLeft: "18px", marginRight: "18px", marginTop: "16px", marginBottom: "12px", border: "none", borderTop: "6px solid #BEBEBE" }} />
@@ -648,10 +657,11 @@ export default function MessageBoard() {
                 <div className="bg-[#A3A3A3] h-10 sm:h-[60px] flex items-center justify-center text-white text-xl sm:text-3xl [font-family:RodinNTLG,sans-serif]">Post</div>
                 <div className="bg-white p-4 sm:p-8">
                   <p
-                    className="w-full [font-family:GrecoStd,sans-serif] text-2xl sm:text-4xl text-[#3d3d3d] min-h-[240px] sm:min-h-[420px] whitespace-pre-wrap break-words leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y] px-5 sm:px-11"
+                    className="w-full [font-family:GrecoStd,sans-serif] text-2xl sm:text-4xl text-[#3d3d3d] min-h-[240px] sm:min-h-[420px] whitespace-pre-wrap break-words leading-14 bg-[linear-gradient(to_bottom,transparent_55px,#d6d6d6_55px,#d6d6d6_56px)] [background-attachment:local] [background-repeat:repeat-y]"
                     style={{
                       backgroundSize: "calc(100% - 56px) 56px",
-                      backgroundPosition: "18px 0"
+                      backgroundPosition: "18px 0",
+                      padding: "0 48px",
                     }}
                   >
                     {readingNote.content}

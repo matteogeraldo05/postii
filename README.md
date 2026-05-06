@@ -1,94 +1,33 @@
-<a name="top"></a>
+# Postii
 
-<div align="center">
+A Wii Message Board-inspired shared message board built with React, TypeScript, Vite, and Supabase.
 
-# 🎮 Postii
+## Features
 
-**A Wii Message Board-inspired shared sticky note board**
+- **Post notes** — write short messages that appear as pinned note cards on the board
+- **Drag & drop** — reposition cards freely; positions persist to the database
+- **Calendar view** — browse posts by date
+- **Daily cap** — max 10 posts per day; past dates are read-only
+- **Bad word filtering** — profanity is automatically censored before saving
+- **Custom cursor** — Wii-style pointer with grab state on drag
+- **Wii-authentic UI** — original fonts, sounds, and animations
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Supabase](https://img.shields.io/badge/Supabase-Postgres_+_Realtime-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
+## Tech Stack
 
-*Post it. Drag it. Leave your mark.*
+- React 19 + TypeScript
+- Vite 8
+- Tailwind CSS 4
+- Supabase (Postgres + realtime)
 
-</div>
-
----
-
-## ✨ Features
-
-| Feature | Description |
-|:---|:---|
-| 📝 **Post Notes** | Write short messages that appear as pinned note cards on the board |
-| 🖱️ **Drag & Drop** | Reposition cards freely — positions persist to the database |
-| 📅 **Calendar View** | Browse posts by date, just like the Wii Message Board |
-| 🚦 **Daily Cap** | Max 10 posts per day; past dates are read-only |
-| 🤬 **Bad Word Filter** | Profanity is automatically censored before saving |
-| 🎯 **Custom Cursor** | Wii-style pointer with grab state on drag |
-| 🎨 **Wii-Authentic UI** | Original fonts, sounds, and animations |
-
----
-
-## 🛠️ Tech Stack
-
-```
-React 19 + TypeScript   →  UI & type safety
-Vite 8                  →  Lightning-fast builds
-Tailwind CSS 4          →  Utility-first styling
-Supabase                →  Postgres database + realtime sync
-```
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
-# Clone the repo
-git clone https://github.com/your-username/postii.git
-cd postii
-
-# Install dependencies
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-> **Requires** a Supabase project with a `notes` table containing `id`, `content`, `x`, `y`, and `created_at` columns.
+Requires a Supabase project with a `notes` table containing `id`, `content`, `x`, `y`, and `created_at` columns.
 
-### Database Schema
+## Asset Credits
 
-```sql
-create table notes (
-  id         uuid primary key default gen_random_uuid(),
-  content    text not null,
-  x          float not null default 0,
-  y          float not null default 0,
-  created_at timestamptz not null default now()
-);
-```
-
----
-
-## 🗂️ Project Structure
-
-```
-postii/
-├── src/
-│   ├── components/     # UI components (Board, NoteCard, Calendar…)
-│   ├── hooks/          # Custom React hooks
-│   ├── lib/            # Supabase client & utilities
-│   └── assets/         # Fonts, sounds, images (Nintendo)
-├── public/
-└── vite.config.ts
-```
-
----
-
-## 📃 Asset Credits
-
-> All images, fonts, and audio are property of **Nintendo**.  
-> This project is a fan-made recreation for **educational and personal use only** and is not affiliated with or endorsed by Nintendo.
+All images, fonts, and audio are property of **Nintendo**. This project is a fan-made recreation for educational and personal use only and is not affiliated with or endorsed by Nintendo.
