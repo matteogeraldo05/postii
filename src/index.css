@@ -35,6 +35,11 @@
   to   { opacity: 0; }
 }
 
+@keyframes board-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @keyframes button-exit-left {
   from { transform: translateX(0); }
   to   { transform: translateX(-250%); }

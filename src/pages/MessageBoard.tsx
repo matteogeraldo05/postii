@@ -47,11 +47,11 @@ type Note = {
   created_at: string;
 };
 
-type BoardPhase = "board" | "flash" | "transitioning" | "calendar" | "composing" | "reading";
+type BoardPhase = "board" | "transitioning" | "calendar" | "composing" | "reading";
 
 type ModalAnim = "enter" | "idle" | "exit-up" | "shrink";
 
-function PillButton({ label, onClick }: { label: string; onClick: () => void }) {
+function PillButton({ label, onClick, noFlash }: { label: string; onClick: () => void; noFlash?: boolean }) {
   const [flashKey, setFlashKey] = useState(0);
 
   return (
@@ -59,7 +59,7 @@ function PillButton({ label, onClick }: { label: string; onClick: () => void }) 
       onClick={() => {
         clickSound.currentTime = 0;
         clickSound.play();
-        setFlashKey((k) => k + 1);
+        if (!noFlash) setFlashKey((k) => k + 1);
         onClick();
       }}
       onMouseEnter={() => {
@@ -73,7 +73,7 @@ function PillButton({ label, onClick }: { label: string; onClick: () => void }) 
       <span className="absolute inset-0 flex items-center justify-center text-5xl [font-family:RodinNTLG,sans-serif] text-[#3d3d3d]">
         {label}
       </span>
-      {flashKey > 0 && (
+      {!noFlash && flashKey > 0 && (
         <div
           key={flashKey}
           className="absolute inset-0 bg-white rounded-full pointer-events-none animate-[camera-flash_0.9s_ease-out_forwards]"
@@ -85,11 +85,11 @@ function PillButton({ label, onClick }: { label: string; onClick: () => void }) 
 }
 
 function CircleButton({
-  src, alt, side, label, onClick, onFlashEnd, exiting, entering, blocked, dimmed,
+  src, alt, side, label, onClick, onFlashEnd, exiting, entering, blocked, dimmed, noFlash,
 }: {
   src: string; alt: string; side: "left" | "right"; label: string;
   onClick?: () => void; onFlashEnd?: () => void;
-  exiting?: boolean; entering?: boolean; blocked?: boolean; dimmed?: boolean;
+  exiting?: boolean; entering?: boolean; blocked?: boolean; dimmed?: boolean; noFlash?: boolean;
 }) {
   const [flashKey, setFlashKey] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -98,7 +98,7 @@ function CircleButton({
     if (blocked) return;
     clickSound.currentTime = 0;
     clickSound.play();
-    setFlashKey((k) => k + 1);
+    if (!noFlash) setFlashKey((k) => k + 1);
     onClick?.();
   }
 
@@ -147,7 +147,7 @@ function CircleButton({
         className={`relative z-10 size-36 rounded-full border-4 border-[#31bdef] overflow-hidden cursor-pointer bg-transparent shadow-[4px_6px_0_rgba(0,0,0,0.2)] transition-transform duration-[170ms] ease-out hover:scale-110 active:scale-99 fast-active${dimmed ? " opacity-40" : ""}`}
       >
         <img src={src} alt={alt} className="w-full h-full object-cover" />
-        {flashKey > 0 && (
+        {!noFlash && flashKey > 0 && (
           <div
             key={flashKey}
             className="absolute inset-0 bg-white pointer-events-none animate-[camera-flash_0.9s_ease-out_forwards]"
@@ -175,6 +175,7 @@ export default function MessageBoard() {
   const [shaking, setShaking] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
+  const [overlayFading, setOverlayFading] = useState(false);
 
   // Drag + focus state
   const [topNoteId, setTopNoteId] = useState<string | null>(null);
@@ -365,7 +366,7 @@ export default function MessageBoard() {
   const showBoard = phase !== "calendar";
   const showCalendar = (phase === "transitioning" && transitionDest.current === "calendar") || phase === "calendar";
   const boardFadingOut = phase === "transitioning" && transitionDest.current === "calendar";
-  const showCircleButtons = phase === "board" || phase === "flash" || phase === "transitioning";
+  const showCircleButtons = phase === "board" || phase === "transitioning";
   const blocked = phase !== "board";
   const buttonsExiting = phase === "transitioning";
 
@@ -393,9 +394,9 @@ export default function MessageBoard() {
     setTimeout(() => setBoardEntering(false), 600);
   }
 
-  function handleSelectDate(date: Date) {
+  async function handleSelectDate(date: Date) {
     setSelectedDate(date);
-    loadNotesForDate(date);
+    await loadNotesForDate(date);
     setBoardEntering(true);
     setPhase("board");
     setCalendarEntered(false);
@@ -408,6 +409,7 @@ export default function MessageBoard() {
     setComposeText("");
     setModalAnim("enter");
     setPillsExiting(false);
+    setOverlayFading(false);
     setPhase("composing");
   }
 
@@ -417,6 +419,7 @@ export default function MessageBoard() {
     setReadingNote(note);
     setModalAnim("enter");
     setPillsExiting(false);
+    setOverlayFading(false);
     setPhase("reading");
   }
 
@@ -465,14 +468,14 @@ export default function MessageBoard() {
     if (modalAnim === "enter") {
       setModalAnim("idle");
     } else if (modalAnim === "exit-up") {
-      setBoardEntering(true);
+      setOverlayFading(true);
       setPhase("board");
       setReadingNote(null);
-      setTimeout(() => setBoardEntering(false), 600);
+      setTimeout(() => setOverlayFading(false), 400);
     } else if (modalAnim === "shrink") {
-      setBoardEntering(true);
+      setOverlayFading(true);
       setPhase("board");
-      setTimeout(() => setBoardEntering(false), 600);
+      setTimeout(() => setOverlayFading(false), 400);
     }
   }
 
@@ -493,11 +496,8 @@ export default function MessageBoard() {
     }
 
     transitionDest.current = "composing";
-    setPhase("flash");
-    setTimeout(() => {
-      setPhase("transitioning");
-      setTimeout(() => openCompose(), 500);
-    }, 200);
+    setPhase("transitioning");
+    setTimeout(() => openCompose(), 500);
   }
 
   const modalAnimClass =
@@ -511,7 +511,7 @@ export default function MessageBoard() {
       {/* Board background */}
       {showBoard && (
         <div
-          className={`absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8] ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""} ${loading ? "opacity-80" : ""}`}
+          className={`absolute inset-0 bg-gradient-to-b from-[#cdcfd8] via-[#f1f1f1] to-[#cdcfd8] ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : boardEntering ? "animate-[board-fade-in_0.4s_ease-out_forwards]" : ""} ${loading ? "opacity-80" : ""}`}
         >
           
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-[28%] h-36 bg-[#fffeff]/50 border-4 border-[#A3A3A3] shadow-[4px_4px_4px_rgba(0,0,0,0.2)] rounded-b-full z-299" />
@@ -541,7 +541,7 @@ export default function MessageBoard() {
                 setTopNoteId(note.id);
               }
             }}
-            className={`absolute w-[300px] h-[200px] transition-transform duration-150 ease-out hover:scale-110 ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : ""} ${phase !== "board" ? "pointer-events-none" : ""}`}
+            className={`absolute w-[300px] h-[200px] transition-transform duration-150 ease-out hover:scale-110 ${boardFadingOut ? "animate-[board-fade-out_0.5s_ease-out_forwards]" : boardEntering ? "animate-[board-fade-in_0.4s_ease-out_forwards]" : ""} ${phase !== "board" ? "pointer-events-none" : ""}`}
             style={{ left: `${note.x}%`, top: `${note.y}%`, zIndex: topNoteId === note.id ? 100 : 5 }}
           >
             {/* pushpin */}
@@ -563,8 +563,8 @@ export default function MessageBoard() {
         ))}
 
       {/* Scanline overlay */}
-      {(phase === "composing" || phase === "reading") && (
-        <div className="absolute inset-0 pointer-events-none z-20 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)]" />
+      {(phase === "composing" || phase === "reading" || overlayFading) && (
+        <div className={`absolute inset-0 pointer-events-none z-20 bg-gray-700/10 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)] ${overlayFading ? "animate-[board-fade-out_0.4s_ease-out_forwards]" : "animate-[board-fade-in_0.3s_ease-out_forwards]"}`} />
       )}
 
       {/* Compose modal */}
@@ -613,7 +613,7 @@ export default function MessageBoard() {
           >
             <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
               <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
-              <PillButton label="Back" onClick={handleComposeBack} />
+              <PillButton label="Back" onClick={handleComposeBack} noFlash />
             </div>
           </div>
 
@@ -623,7 +623,7 @@ export default function MessageBoard() {
           >
             <div className="flex items-center justify-center scale-[0.85] origin-bottom-right">
               <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -right-43" />
-              <PillButton label="Post" onClick={handlePost} />
+              <PillButton label="Post" onClick={handlePost} noFlash />
             </div>
           </div>
         </>
@@ -665,7 +665,7 @@ export default function MessageBoard() {
           >
             <div className="flex items-center justify-center scale-[0.85] origin-bottom-left">
               <div className="absolute w-140 h-48 rounded-full bg-gray-700/8 border-4 border-gray-400 shadow-[4px_6px_0_rgba(0,0,0,0.2)] z-0 -left-43" />
-              <PillButton label="Close" onClick={handleReadClose} />
+              <PillButton label="Close" onClick={handleReadClose} noFlash />
             </div>
           </div>
         </>
@@ -682,10 +682,10 @@ export default function MessageBoard() {
             blocked={blocked}
             exiting={buttonsExiting}
             entering={boardEntering}
+            noFlash
             onClick={() => {
               transitionDest.current = "calendar";
-              setPhase("flash");
-              setTimeout(() => setPhase("transitioning"), 200);
+              setPhase("transitioning");
             }}
           />
           <CircleButton
@@ -697,6 +697,7 @@ export default function MessageBoard() {
             dimmed={atCap || isViewingPast}
             exiting={buttonsExiting}
             entering={boardEntering}
+            noFlash
             onClick={handleCreateNote}
           />
         </>
