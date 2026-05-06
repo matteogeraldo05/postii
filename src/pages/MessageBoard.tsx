@@ -227,12 +227,6 @@ export default function MessageBoard() {
   useEffect(() => {
     function onMouseDown(e: MouseEvent) {
       if (phaseRef.current !== "board") return;
-      const sel = selectedDateRef.current;
-      if (sel) {
-        const today0 = new Date(); today0.setHours(0, 0, 0, 0);
-        const sel0 = new Date(sel); sel0.setHours(0, 0, 0, 0);
-        if (sel0.getTime() < today0.getTime()) return;
-      }
 
       for (const [id, el] of noteEls.current) {
         if (el.contains(e.target as Node)) {
@@ -284,6 +278,15 @@ export default function MessageBoard() {
         if (Math.sqrt(dx * dx + dy * dy) < 5) {
           dragRafId.current = requestAnimationFrame(tick);
           return;
+        }
+        const selCheck = selectedDateRef.current;
+        if (selCheck) {
+          const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+          const sel0 = new Date(selCheck); sel0.setHours(0, 0, 0, 0);
+          if (sel0.getTime() < today0.getTime()) {
+            dragRafId.current = requestAnimationFrame(tick);
+            return;
+          }
         }
         ds.committed = true;
       }
